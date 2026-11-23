@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <link rel="icon" type="image/png" href="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+    <meta name="description" content="" />
+    <meta name="theme-color" content="#07080b" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="robots" content="noindex, nofollow" id="sp-robots" />
+    <script>(function(){var h=location.hostname;if(h&&h!=='localhost'&&h!=='127.0.0.1'&&!/^\d{1,3}(?:\.\d{1,3}){3}$/.test(h)){var m=document.getElementById('sp-robots');if(m)m.setAttribute('content','index,follow');}})();</script>
+    <title></title>
+    <script src="/config.js?v=api66"></script>
+    <script>
+      (function () {
+        try {
+          var cfg = window.__SP_CONFIG__ || {}
+          var q = new URLSearchParams(location.search || '')
+          if (q.get('noredirect') === '1' || q.get('force') === 'pc' || q.get('force') === 'mobile') return
+          var host = location.hostname || ''
+          if (!host || host === 'localhost' || host === '127.0.0.1' || /^\d{1,3}(?:\.\d{1,3}){3}$/.test(host)) return
+          var pc = String(cfg.pcSiteUrl || '').replace(/\/$/, '')
+          var mob = String(cfg.mobileSiteUrl || '').replace(/\/$/, '')
+          if (!pc || !mob) return
+          var ua = navigator.userAgent || ''
+          var mobile = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(ua)
+            || /iPad|Tablet/i.test(ua)
+            || (navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1)
+          var kind = cfg.siteKind === 'mobile' ? 'mobile' : 'pc'
+          var target = ''
+          if (kind === 'pc' && mobile) target = mob
+          if (kind === 'mobile' && !mobile) target = pc
+          if (!target) return
+          var to = new URL(target)
+          if (to.origin === location.origin) return
+          var path = location.pathname || '/'
+          var search = location.search || ''
+          var hash = location.hash || ''
+          // History path → hash path when jumping to the paired site
+          if ((!hash || hash === '#' || hash === '#/') && path && path !== '/') {
+            hash = '#' + path + (search || '')
+            path = '/'
+            search = ''
+          }
+          to.pathname = path
+          to.search = search
+          to.hash = hash
+          location.replace(to.toString())
+        } catch (e) {}
+      })()
+    </script>
+    <script>
+      (function () {
+        function abs(path) {
+          if (!path) return ''
+          if (/^https?:\/\//i.test(path) || path.indexOf('data:') === 0) return path
+          var cfg = window.__SP_CONFIG__ || {}
+          var origin = (cfg.assetOrigin || '').replace(/\/$/, '')
+          if (!origin && cfg.apiBaseUrl && /^https?:\/\//i.test(cfg.apiBaseUrl)) {
+            try { origin = new URL(cfg.apiBaseUrl).origin } catch (e) {}
+          }
+          return origin ? origin + (path.charAt(0) === '/' ? path : '/' + path) : path
+        }
+        function paintBoot(data) {
+          if (!data) return
+          window.__SP_BOOT_BRAND__ = data
+          var img = document.querySelector('#boot img')
+          var nameEl = document.querySelector('#boot b')
+          var icon = document.querySelector('link[rel="icon"]')
+          if (img && data.logo) img.src = abs(data.logo)
+          if (nameEl && data.name) nameEl.textContent = String(data.name)
+          if (data.name) document.title = data.name
+          if (icon && data.logo) icon.href = abs(data.logo)
+        }
+        window.__SP_PAINT_BOOT__ = paintBoot
+        function apply(data) {
+          paintBoot(data)
+          if (data && !document.querySelector('#boot img')) {
+            document.addEventListener('DOMContentLoaded', function () { paintBoot(data) }, { once: true })
+          }
+        }
+        function apiUrl() {
+          var cfg = window.__SP_CONFIG__ || {}
+          var base = (cfg.apiBaseUrl || '/api/v1').replace(/\/$/, '')
+          return base + '/platform/site'
+        }
+        try {
+          var cached = sessionStorage.getItem('sp_site_v2')
+          if (cached) apply(JSON.parse(cached).data)
+        } catch (e) {}
+        window.__SP_BOOT_READY__ = fetch(apiUrl(), { credentials: 'omit' })
+          .then(function (r) { return r.json() })
+          .then(function (res) {
+            var data = res && res.data ? res.data : null
+            if (!data) return null
+            apply(data)
+            try {
+              sessionStorage.setItem('sp_site_v2', JSON.stringify({ at: Date.now(), locale: localStorage.getItem('locale') || '', data: data }))
+            } catch (e) {}
+            return data
+          })
+          .catch(function () { return null })
+      })()
+    </script>
+    <style>
+      #boot{position:fixed;inset:0;z-index:80;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#07080b;color:#f4f1ea;transition:opacity .45s ease,visibility .45s ease}
+      @media (min-width:640px){html,body{background:#05060a}#boot{left:calc(50% - 215px);right:auto;width:430px;max-width:100%}}
+      #boot.hide{opacity:0!important;visibility:hidden!important;pointer-events:none!important;z-index:-1!important;display:none!important}
+      #boot img{width:72px;height:72px;object-fit:contain;visibility:hidden;animation:bootPulse 1.4s ease infinite}
+      #boot img[src]{visibility:visible}
+      #boot b{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;letter-spacing:.18em;font-size:12px;color:#d4af7a}
+      #boot .ring{position:absolute;width:92px;height:92px;border-radius:50%;border:1px solid rgba(212,175,122,.28);animation:bootRing 1.8s ease-out infinite}
+      @keyframes bootPulse{50%{transform:scale(1.06)}}
+      @keyframes bootRing{from{transform:scale(.7);opacity:.8}to{transform:scale(1.35);opacity:0}}
+    </style>
+    <script>
+      (function () {
+        function killBoot() {
+          var el = document.getElementById('boot')
+          if (!el) return
+          el.classList.add('hide')
+          el.style.pointerEvents = 'none'
+          el.style.display = 'none'
+          try { el.remove() } catch (e) {}
+        }
+        window.setTimeout(killBoot, 1600)
+        window.addEventListener('load', function () { window.setTimeout(killBoot, 400) })
+      })()
+    </script>
+    <script type="module" crossorigin src="/assets/index-cGALpXY2.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/vue-CY_quBoR.js">
+    <link rel="modulepreload" crossorigin href="/assets/vant-D2bbvGr1.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-CrWGf8tV.css">
+  </head>
+  <body>
+    <div id="boot"><i class="ring"></i><img alt="" /><b></b></div>
+    <script>
+      (function () {
+        var paint = window.__SP_PAINT_BOOT__
+        if (!paint) return
+        var data = window.__SP_BOOT_BRAND__
+        if (!data) {
+          try {
+            var cached = sessionStorage.getItem('sp_site_v2')
+            data = cached ? JSON.parse(cached).data : null
+          } catch (e) {}
+        }
+        if (data) paint(data)
+      })()
+    </script>
+    <div id="app"></div>
+  </body>
+</html>
