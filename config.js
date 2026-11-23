@@ -5,7 +5,7 @@
     apiBaseUrl: local ? '/api/v1' : 'https://api.xj673.shop/api/v1',
     assetOrigin: local ? '' : 'https://api.xj673.shop',
     siteKind: 'mobile',
-    pcSiteUrl: 'https://hkexp.z11.web.core.windows.net',
-    mobileSiteUrl: 'https://hkexh.z11.web.core.windows.net',
+    pcSiteUrl: 'https://hkexp-ctkpu.ondigitalocean.app',
+    mobileSiteUrl: 'https://hkexh-f9c5h.ondigitalocean.app',
   }
 })()
